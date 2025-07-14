@@ -1,6 +1,5 @@
 FROM ruby:2.7
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg2 \
@@ -15,30 +14,24 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     python3
 
-# Install Node.js 18.x (LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs
 
-# Install Yarn 1.x (latest stable)
 RUN npm install -g yarn
 
-# Upgrade RubyGems and install correct Bundler version
 RUN gem update --system 3.3.26
 RUN gem install bundler:2.4.22
 
 WORKDIR /app
 
-# Copy Gemfiles and install gems
 COPY Gemfile Gemfile.lock ./
-RUN bundle _2.4.22_ install --retry 3
+RUN bundle _2.4.22_ install --jobs 1 --retry 3
 
-# Copy the rest of the application code
 COPY . .
 
-# Install JS dependencies
 RUN yarn install
 
-# Precompile Rails assets
+ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN bundle exec rake assets:precompile
 
 EXPOSE 3000
