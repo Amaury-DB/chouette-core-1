@@ -67,3 +67,5 @@
 
 # For byebug users
 /.byebug_history
+Dockerfile§
+*.old
