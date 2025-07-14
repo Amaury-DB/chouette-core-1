@@ -1,0 +1,31 @@
+#!/bin/bash
+set -e
+
+# Source build.rc if it exists
+[ -f build.rc ] && source build.rc
+
+case "$1" in
+  "docker::bundler::install")
+    # Install system dependencies if any are defined in build.rc
+    if [[ -n "$DEV_PACKAGES" ]]; then
+      apt-get update
+      apt-get install -y $DEV_PACKAGES
+    fi
+    bundle install --jobs 4 --retry 3
+    ;;
+  "docker::yarn::install")
+    yarn install --frozen-lockfile
+    ;;
+  "docker::assets::precompile")
+    # Set up production environment if needed
+    if type docker_env_production &>/dev/null; then
+      docker_env_production
+    fi
+    # Precompile assets
+    bundle exec rake assets:precompile
+    ;;
+  *)
+    echo "Usage: $0 [docker::bundler::install|docker::yarn::install|docker::assets::precompile]"
+    exit 1
+    ;;
+esac
