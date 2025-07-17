@@ -14,10 +14,6 @@
 # Local config (see .env.sample)
 /.env
 
-# Ignore ruby-version (use your own)
-/.ruby-version
-/.ruby-gemset
-
 # Ignore nvmrc (use your own)
 /.nvmrc
 
